@@ -7,17 +7,25 @@ import ContactForm from './ContactForm/ContactForm';
 
 class App extends Component {
   state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
+    contacts: [],
     filter: '',
   };
 
-  handleFilterChange = evt => {
-    const filterValue = evt.target.value;
+  componentDidMount() {
+    const localStorageData = localStorage.getItem('contacts');
+    if (localStorageData && JSON.parse(localStorageData).length) {
+      this.setState({ contacts: JSON.parse(localStorageData) });
+    }
+  }
+
+  componentDidUpdate(_, prevState) {
+    if (prevState.contacts !== this.state.contacts) {
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+    }
+  }
+
+  handleFilterChange = event => {
+    const filterValue = event.target.value;
 
     this.setState({ filter: filterValue });
   };
@@ -30,8 +38,8 @@ class App extends Component {
     if (isNameExist) return alert(`${isNameExist.name} is already in contacts`);
 
     const contact = {
-      ...newContact,
       id: nanoid(),
+      ...newContact,
     };
 
     this.setState(prevState => ({
